@@ -15,7 +15,8 @@ const gameState = {
 	messages: [],
 	showdown: false,
 	minBet: 20,
-	allIn: false
+	allIn: false,
+	rounds: 0,
 };
 
 const addSpectators = (socketId) => {
@@ -42,6 +43,11 @@ const addPlayer = (socketId) => {
 
 const dealPlayers = () => {
 	gameState.board = [];
+	gameState.rounds++;
+	if (gameState.rounds % 10 === 0) {
+		gameState.smallBlindValue *= 2;
+		gameState.bigBlindValue *= 2;
+	}
 	gameState.gameDeck.shuffleDeck();
 	for (let i = 0; i < gameState.players.length; i++) {
 		gameState.players[i].cards = gameState.gameDeck.dealCards(2);
@@ -212,7 +218,7 @@ const changeBoard = () => {
 		resetPlayerAction();
 		gameState.minBet = 10
 		gameState.gameDeck.dealCards(1).forEach((card) => gameState.board.push(card));
-	} else if (gameState.action === 'turn') {	
+	} else if (gameState.action === 'turn') {
 		gameState.action = 'river';
 		resetActive();
 		resetPlayerAction();
@@ -260,7 +266,7 @@ const fold = (socketId) => {
 };
 
 const allInMode = () => {
-	
+
 	if (gameState.allIn === true) {
 
 		// deal out remaining cards
